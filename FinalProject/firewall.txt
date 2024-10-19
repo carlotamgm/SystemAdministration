@@ -1,0 +1,38 @@
+# Limpiamos las tablas anteriores
+	sudo iptables -F
+sudo iptables -X
+sudo iptables -Z
+sudo iptables -t nat -F
+# Rechazamos todo por defecto
+	sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD DROP
+# Permite todo el tráfico intranet y todo el tráfico de salida
+# y los pings de la intranet pero no del host
+sudo iptables -A FORWARD -i enp0s8 -p icmp --icmp-type 0 -j ACCEPT
+sudo iptables -A FORWARD -i enp0s3 -p all -j ACCEPT
+sudo iptables -A FORWARD -i enp0s9 -p all -j ACCEPT
+sudo iptables -A FORWARD -i enp0s10 -p all -j ACCEPT
+	sudo iptables -A INPUT -i enp0s8 -p icmp --icmp-type 0 -j DROP
+sudo iptables -A INPUT -i enp0s3 -p all -j ACCEPT
+sudo iptables -A INPUT -i enp0s9 -p all -j ACCEPT
+sudo iptables -A INPUT -i enp0s10 -p all -j ACCEPT
+# Permite el tráfico a debian2 y a debian5, respectivamente
+	sudo iptables -A FORWARD -d 192.168.1.2 -p tcp --dport 80 -j ACCEPT
+sudo iptables -A FORWARD -d 192.168.3.2 -p tcp --dport 22 -j ACCEPT
+# Redirecciones al servidor web Apache de debian2 y al servidor SSH de debian5
+sudo iptables -t nat -A PREROUTING -i enp0s10 -p tcp --dport 80 -j DNAT --to 
+192.168.1.2
+sudo iptables -t nat -A PREROUTING -i enp0s10 -p tcp --dport 22 -j DNAT --to 
+192.168.3.2
+# Todo el tráfico hacia la extranet desde la intranet utiliza como IP origen la 
+# dirección pública del firewall con independencia del nodo de origen
+sudo iptables -t nat -A POSTROUTING -o enp0s8 -j SNAT --to-source 192.168.56.2
+# Todo el tráfico desde la extranet hacia la intranet utiliza como IP destino la 
+# dirección pública del firewall con independencia del nodo de destino
+sudo iptables -t nat -A PREROUTING -i enp0s8 -j DNAT --to 192.168.56.2
+# Internet
+sudo iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o enp0s3 -j MASQUERADE
+sudo iptables -t nat -A POSTROUTING -s 192.168.2.0/24 -o enp0s3 -j MASQUERADE
+sudo iptables -t nat -A POSTROUTING -s 192.168.3.0/24 -o enp0s3 -j MASQUERADE
+# Para guardar la configuración
+	sudo sh -c  'iptables-save > /etc/iptables/rules.v4'
