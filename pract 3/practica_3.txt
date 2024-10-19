@@ -1,0 +1,22 @@
+839841, Moncasi Gosá, Carlota, M, 3, A
+843710, Soriano Sánchez, Paula, M, 3, A
+
+El script utiliza una estructura modular y se divide en funciones separadas para realizar tareas específicas: añadir y borrar usuario definido en un fichero.
+Para comprobar que los parámetros de los comandos introducidos son correctos, se muestra un mensaje de error si hay algún campo vacío.
+
+ALL=(ALL) NOPASSWD:ALL agrega una regla al archivo /etc/sudoers para que el usuario "as" pueda ejecutar comandos como superusuario en cualquier host (ALL) utilizando "sudo". 
+La opción "NOPASSWD" significa que no se requiere ingresar una contraseña para ejecutar comandos con privilegios de superusuario.
+
+
+El operador ">&2" redirige la salida de la instrucción "echo" a la salida estándar de error en lugar de a la salida estándar (stdout). 
+Es útil porque se desea mostrar un mensaje de error sin mezclarlo con la salida normal del script.
+
+
+useradd -c "name" "user" -m -k /etc/skel -U -K UID_MIN=1815 &> /dev/null: Se crea el usuario con la utilidad "useradd". La opción "-c" establece el nombre completo del usuario. 
+La opción "-m" crea un directorio home para el usuario en /home. La opción "-k" especifica el directorio de plantilla para el directorio home. 
+La opción "-U" especifica que el UID y el GID del usuario deben ser asignados automáticamente. La opción "-K UID_MIN=1815" establece el UID mínimo en 1815. 
+La salida de la utilidad se redirige a /dev/null para suprimir cualquier salida.
+
+usermod "$user" -f 30: "usermod" se utiliza para modificar las cuentas de usuario en un sistema Linux. La opción "-f 30" establece la contraseña del usuario para que caduque 30 días después de la fecha actual. 
+Esto significa que el usuario debe cambiar su contraseña dentro de los próximos 30 días o no podrá iniciar sesión en el sistema.
+
